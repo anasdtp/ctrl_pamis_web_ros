@@ -26,7 +26,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-           'launch_ctrl_pamis_web = ctrl_pamis_web_ros.mainwindow:main',
+           'ctrl_pamis_web = ctrl_pamis_web_ros.mainwindow:main',
         ],
     },
 )

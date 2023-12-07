@@ -9,7 +9,7 @@
 
 import sys
 from PySide6.QtWidgets import QApplication, QMainWindow
-from ui_mainwindow import Ui_MainWindow #ne pas oublier de faire 'pyside6-uic mainwindow.ui -o ui_mainwindow.py' à chaque modif du .ui
+from .ui_mainwindow import Ui_MainWindow #ne pas oublier de faire 'pyside6-uic mainwindow.ui -o ui_mainwindow.py' à chaque modif du .ui
 
 import rclpy
 from rclpy.node import Node
