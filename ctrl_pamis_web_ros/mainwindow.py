@@ -14,13 +14,6 @@ from flask import Flask
 flsk = Flask(__name__)
 ros_message = "Aucun message reçu"
 
-num_msg = "0"  #numero du msg, le pamis l'utilisera pour savoir si un nv msg à spawn ou non
-num_pamis = "0"
-order = "0"
-arg1 = "0"
-arg2 = "0"
-arg3 = "0"
-
 
 # ROS 2 --------------------------------------------------------------
 class MinimalSubscriber(Node):
@@ -59,6 +52,18 @@ def run_ros_node():
 
 
 
+class Message():
+    def __init__(self):
+        self.num_msg_int = 0
+        self.num_msg_str = str(self.num_msg_int)  #numero du msg, le pamis l'utilisera pour savoir si un nv msg à spawn ou non
+        self.num_pamis = "0"
+        self.order = "0"
+        self.arg1 = "0"
+        self.arg2 = "0"
+        self.arg3 = "0"
+
+msg_pamis = Message()
+
 # MainWindow ---------------------------------------------------------
 class MainWindow(QMainWindow):
 
@@ -66,6 +71,7 @@ class MainWindow(QMainWindow):
         super(MainWindow, self).__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+        self.ui.sendButton_rotation.clicked.connect(self.rotation)
 
 #        self.ui.sendButton.clicked.connect(self.doSomething)
 #        self.i = 0
@@ -75,6 +81,51 @@ class MainWindow(QMainWindow):
 #        msg = String()
 #        msg.data = self.ui.lineEdit_1.text()
 #        self.node_.publish_string(msg)
+
+    def rotation(self):
+        msg_pamis.num_msg_int +=1
+        msg_pamis.num_msg_str = str(msg_pamis.num_msg_int)
+        # msg_pamis.num_pamis
+        msg_pamis.order = "1"
+        degree = float(self.ui.lineEdit_rotation.text)
+        degree = degree * 10 #dizieme de degree
+        msg_pamis.arg1 = str(int(degree))
+        msg_pamis.arg2 = "0"
+        msg_pamis.arg3 = "0"
+
+    def translation(self):
+        msg_pamis.num_msg_int +=1
+        msg_pamis.num_msg_str = str(msg_pamis.num_msg_int)
+        # num_pamis
+        msg_pamis.order = "2"
+        distance = int(self.ui.lineEdit_translation.text)
+        msg_pamis.arg1 = str(distance)
+        msg_pamis.arg2 = "0"
+        msg_pamis.arg3 = "0"
+
+    def XYT(self):
+        msg_pamis.num_msg_int +=1
+        msg_pamis.num_msg_str = str(msg_pamis.num_msg_int)
+        # num_pamis
+        msg_pamis.order = "3"
+        x = int(self.ui.lineEdit_XYT_x.text)
+        y = int(self.ui.lineEdit_XYT_y.text)
+        theta = int(self.ui.lineEdit_XYT_theta.text)
+
+        msg_pamis.arg1 = str(x)
+        msg_pamis.arg2 = str(y)
+        msg_pamis.arg3 = str(theta)
+
+    def recalage(self):
+        msg_pamis.num_msg_int +=1
+        msg_pamis.num_msg_str = str(msg_pamis.num_msg_int)
+        # num_pamis
+        msg_pamis.order = "4"
+        distance = int(self.ui.lineEdit_recalage_distance.text)
+        coordonnee = self.ui.comboBox_recalage
+        msg_pamis.arg1 = str(distance)
+        msg_pamis.arg2 = "0"
+        msg_pamis.arg3 = "0"
 
     def closeEvent(self, event):
         print("Au revoir")
@@ -97,7 +148,7 @@ def home():
 
 @flsk.route('/pamis')
 def pamis():
-    return f'{num_pamis},{order},{arg1},{arg2},{arg3}'
+    return f'{msg_pamis.num_msg_str},{msg_pamis.num_pamis},{msg_pamis.order},{msg_pamis.arg1},{msg_pamis.arg2},{msg_pamis.arg3}'
 
 def window_show():
     window = MainWindow()
