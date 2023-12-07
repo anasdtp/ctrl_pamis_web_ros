@@ -1,6 +1,15 @@
+#  Open terminal #2 (run one of below commands at a time)
+#  ros2 topic pub -1 /ctrl_pamis interfaces_cdf/msg/PAMI "{num_pamis: 1, type: 1, arg1: 90}"
+#  ros2 topic pub -1 /ctrl_pamis interfaces_cdf/msg/PAMI "{num_pamis: 1, type: 2, arg1: 100}"
+#  ros2 topic pub -1 /ctrl_pamis interfaces_cdf/msg/PAMI "{num_pamis: 1, type: 3, arg1: 450, arg2: 450, arg3: 90}"
+#  ros2 topic pub -1 /ctrl_pamis interfaces_cdf/msg/PAMI "{num_pamis: 1, type: 4, arg1: 1000, arg2: -1}"
+# 
+#  $ ros2 service call /name_example name_project/srv/srv_msg_exemples "data : x"
+
+
 import sys
 from PySide6.QtWidgets import QApplication, QMainWindow
-from ui_mainwindow import Ui_MainWindow
+from ui_mainwindow import Ui_MainWindow #ne pas oublier de faire 'pyside6-uic mainwindow.ui -o ui_mainwindow.py' à chaque modif du .ui
 
 import rclpy
 from rclpy.node import Node
@@ -14,6 +23,22 @@ from flask import Flask
 flsk = Flask(__name__)
 ros_message = "Aucun message reçu"
 
+# Protocol de com ----------------------------------------------------
+class Message():
+    def __init__(self):
+        #Sur la page web : 
+        #[num_msg_int],[num_pamis],[order],[arg1],[arg2],[arg3]
+        self.num_msg_int = 0
+        self.num_msg_str = str(self.num_msg_int)  #numero du msg, le pamis l'utilisera pour savoir si un nv msg à spawn ou non
+        self.num_pamis = "0"
+        self.order = "0"
+        self.arg1 = "0"
+        self.arg2 = "0"
+        self.arg3 = "0"
+    # fin de la classe
+
+msg_pamis = Message() #structure mise en global
+# Protocol de com ----------------------------------------------------
 
 # ROS 2 --------------------------------------------------------------
 class MinimalSubscriber(Node):
@@ -40,6 +65,13 @@ class MinimalSubscriber(Node):
         ros_message = msg.data
 
     def pami_callback(self, msg):
+        msg_pamis.num_msg_int +=1
+        msg_pamis.num_msg_str = str(msg_pamis.num_msg_int)
+        msg_pamis.num_pamis = str(msg.num_pamis)
+        msg_pamis.order = str(msg.type)
+        msg_pamis.arg1 = str(msg.arg1)
+        msg_pamis.arg2 = str(msg.arg2)
+        msg_pamis.arg3 = str(msg.arg3)
         self.get_logger().info('I heard from /ctrl_pamis, order : %d' % msg.type)
 
     # fin de la classe
@@ -52,17 +84,7 @@ def run_ros_node():
 
 
 
-class Message():
-    def __init__(self):
-        self.num_msg_int = 0
-        self.num_msg_str = str(self.num_msg_int)  #numero du msg, le pamis l'utilisera pour savoir si un nv msg à spawn ou non
-        self.num_pamis = "0"
-        self.order = "0"
-        self.arg1 = "0"
-        self.arg2 = "0"
-        self.arg3 = "0"
 
-msg_pamis = Message()
 
 # MainWindow ---------------------------------------------------------
 class MainWindow(QMainWindow):
@@ -71,24 +93,18 @@ class MainWindow(QMainWindow):
         super(MainWindow, self).__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        self.ui.sendButton_rotation.clicked.connect(self.rotation)
+        self.ui.sendButton_rotation.clicked.connect(self.rotation)#activation des callback
+        self.ui.sendButton_translation.clicked.connect(self.translation)
+        self.ui.sendButton_XYT.clicked.connect(self.XYT)
+        self.ui.sendButton_recalage.clicked.connect(self.recalage)
 
-#        self.ui.sendButton.clicked.connect(self.doSomething)
-#        self.i = 0
-#        self.node_ = MinimalPublisher()
-
-#    def doSomething(self):
-#        msg = String()
-#        msg.data = self.ui.lineEdit_1.text()
-#        self.node_.publish_string(msg)
-
-    def rotation(self):
+    def rotation(self):#callback function
         msg_pamis.num_msg_int +=1
         msg_pamis.num_msg_str = str(msg_pamis.num_msg_int)
-        # msg_pamis.num_pamis
+        msg_pamis.num_pamis = self.ui.lineEdit_num_pamis.text()
         msg_pamis.order = "1"
-        degree = float(self.ui.lineEdit_rotation.text)
-        degree = degree * 10 #dizieme de degree
+        degree = float(self.ui.lineEdit_rotation.text())
+        degree *= 10 #dizieme de degree
         msg_pamis.arg1 = str(int(degree))
         msg_pamis.arg2 = "0"
         msg_pamis.arg3 = "0"
@@ -96,9 +112,9 @@ class MainWindow(QMainWindow):
     def translation(self):
         msg_pamis.num_msg_int +=1
         msg_pamis.num_msg_str = str(msg_pamis.num_msg_int)
-        # num_pamis
+        msg_pamis.num_pamis = self.ui.lineEdit_num_pamis.text()
         msg_pamis.order = "2"
-        distance = int(self.ui.lineEdit_translation.text)
+        distance = int(self.ui.lineEdit_translation.text())
         msg_pamis.arg1 = str(distance)
         msg_pamis.arg2 = "0"
         msg_pamis.arg3 = "0"
@@ -106,11 +122,11 @@ class MainWindow(QMainWindow):
     def XYT(self):
         msg_pamis.num_msg_int +=1
         msg_pamis.num_msg_str = str(msg_pamis.num_msg_int)
-        # num_pamis
+        msg_pamis.num_pamis = self.ui.lineEdit_num_pamis.text()
         msg_pamis.order = "3"
-        x = int(self.ui.lineEdit_XYT_x.text)
-        y = int(self.ui.lineEdit_XYT_y.text)
-        theta = int(self.ui.lineEdit_XYT_theta.text)
+        x = int(self.ui.lineEdit_XYT_x.text())
+        y = int(self.ui.lineEdit_XYT_y.text())
+        theta = int(self.ui.lineEdit_XYT_theta.text())
 
         msg_pamis.arg1 = str(x)
         msg_pamis.arg2 = str(y)
@@ -119,12 +135,13 @@ class MainWindow(QMainWindow):
     def recalage(self):
         msg_pamis.num_msg_int +=1
         msg_pamis.num_msg_str = str(msg_pamis.num_msg_int)
-        # num_pamis
+        msg_pamis.num_pamis = self.ui.lineEdit_num_pamis.text()
         msg_pamis.order = "4"
-        distance = int(self.ui.lineEdit_recalage_distance.text)
-        coordonnee = self.ui.comboBox_recalage
+        distance = int(self.ui.lineEdit_recalage_distance.text())
+        coordonnee = 1 if self.ui.comboBox_recalage.currentText()=="x" else -1
+
         msg_pamis.arg1 = str(distance)
-        msg_pamis.arg2 = "0"
+        msg_pamis.arg2 = str(coordonnee)
         msg_pamis.arg3 = "0"
 
     def closeEvent(self, event):
@@ -140,7 +157,7 @@ class MainWindow(QMainWindow):
 
 
 def run_flask():
-    flsk.run(host='192.168.188.129', port=8080, debug=False)
+    flsk.run(host='192.168.188.129', port=8080, debug=False) #si debug mis à true, cela ne marchera plus car flask est dans une thread
 
 @flsk.route('/')
 def home():

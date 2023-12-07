@@ -24,20 +24,38 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(735, 302)
+        MainWindow.resize(735, 340)
         MainWindow.setMinimumSize(QSize(90, 0))
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
-        self.verticalLayout_2 = QVBoxLayout(self.centralwidget)
-        self.verticalLayout_2.setObjectName(u"verticalLayout_2")
+        self.verticalLayout = QVBoxLayout(self.centralwidget)
+        self.verticalLayout.setObjectName(u"verticalLayout")
         self.textEdit = QTextEdit(self.centralwidget)
         self.textEdit.setObjectName(u"textEdit")
 
-        self.verticalLayout_2.addWidget(self.textEdit)
+        self.verticalLayout.addWidget(self.textEdit)
+
+        self.horizontalLayout_5 = QHBoxLayout()
+        self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
+        self.label_10 = QLabel(self.centralwidget)
+        self.label_10.setObjectName(u"label_10")
+        self.label_10.setMinimumSize(QSize(150, 0))
+        self.label_10.setLayoutDirection(Qt.LeftToRight)
+        self.label_10.setAlignment(Qt.AlignCenter)
+
+        self.horizontalLayout_5.addWidget(self.label_10)
+
+        self.lineEdit_num_pamis = QLineEdit(self.centralwidget)
+        self.lineEdit_num_pamis.setObjectName(u"lineEdit_num_pamis")
+
+        self.horizontalLayout_5.addWidget(self.lineEdit_num_pamis)
+
+
+        self.verticalLayout.addLayout(self.horizontalLayout_5)
 
         self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
-        self.verticalLayout_2.addItem(self.verticalSpacer)
+        self.verticalLayout.addItem(self.verticalSpacer)
 
         self.horizontalLayout = QHBoxLayout()
         self.horizontalLayout.setObjectName(u"horizontalLayout")
@@ -60,7 +78,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout.addWidget(self.sendButton_rotation)
 
 
-        self.verticalLayout_2.addLayout(self.horizontalLayout)
+        self.verticalLayout.addLayout(self.horizontalLayout)
 
         self.horizontalLayout_2 = QHBoxLayout()
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
@@ -82,7 +100,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_2.addWidget(self.sendButton_translation)
 
 
-        self.verticalLayout_2.addLayout(self.horizontalLayout_2)
+        self.verticalLayout.addLayout(self.horizontalLayout_2)
 
         self.horizontalLayout_3 = QHBoxLayout()
         self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
@@ -140,7 +158,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_3.addWidget(self.sendButton_XYT)
 
 
-        self.verticalLayout_2.addLayout(self.horizontalLayout_3)
+        self.verticalLayout.addLayout(self.horizontalLayout_3)
 
         self.horizontalLayout_4 = QHBoxLayout()
         self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
@@ -184,11 +202,11 @@ class Ui_MainWindow(object):
         self.horizontalLayout_4.addWidget(self.sendButton_recalage)
 
 
-        self.verticalLayout_2.addLayout(self.horizontalLayout_4)
+        self.verticalLayout.addLayout(self.horizontalLayout_4)
 
         self.verticalSpacer_2 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
-        self.verticalLayout_2.addItem(self.verticalSpacer_2)
+        self.verticalLayout.addItem(self.verticalSpacer_2)
 
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
@@ -206,6 +224,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
+        self.label_10.setText(QCoreApplication.translate("MainWindow", u"Num\u00e9ro du Pamis", None))
         self.label.setText(QCoreApplication.translate("MainWindow", u"Rotation (en deg \u00b0)", None))
         self.sendButton_rotation.setText(QCoreApplication.translate("MainWindow", u"Send", None))
         self.label_2.setText(QCoreApplication.translate("MainWindow", u"Translation (en mm)", None))
