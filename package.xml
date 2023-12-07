@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>ctrl_pamis_web_ros</name>
+  <version>0.0.0</version>
+  <description>ROS 2 Python package for pubsub functionality</description>
+  <maintainer email="mohamed-anas.daggag@universite-paris-saclay.fr">anas</maintainer>
+  <license>Apache License 2.0</license>
+
+  <test_depend>ament_copyright</test_depend>
+  <test_depend>ament_flake8</test_depend>
+  <test_depend>ament_pep257</test_depend>
+  <test_depend>python3-pytest</test_depend>
+  
+  <build_export_depend>qtbase5-dev</build_export_depend>
+  <build_export_depend>qt5-qmake</build_export_depend>
+
+  <exec_depend>libqt5-core</exec_depend>
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>

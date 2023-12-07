@@ -1,0 +1,6 @@
+{
+    "files": [
+        "ctrl_pamis_web_ros/mainwindow.py",
+        "ctrl_pamis_web_ros/mainwindow.ui"
+    ]
+}
