@@ -45,12 +45,6 @@ class MinimalSubscriber(Node):
 
     def __init__(self):
         super().__init__('controle_pamis_web')
-        self.subscription = self.create_subscription(
-            String,
-            'topic',
-            self.listener_callback,
-            10)
-        self.subscription # prevent unused variable warning
 
         self.pami_ = self.create_subscription(
             PAMI, 
@@ -58,11 +52,6 @@ class MinimalSubscriber(Node):
             self.pami_callback,
             10)
         self.pami_ # prevent unused variable warning
-
-    def listener_callback(self, msg):
-        self.get_logger().info('I heard: "%s"' % msg.data)
-        global ros_message
-        ros_message = msg.data
 
     def pami_callback(self, msg):
         msg_pamis.num_msg_int +=1
@@ -97,13 +86,24 @@ class MainWindow(QMainWindow):
         self.ui.sendButton_translation.clicked.connect(self.translation)
         self.ui.sendButton_XYT.clicked.connect(self.XYT)
         self.ui.sendButton_recalage.clicked.connect(self.recalage)
+        self.ui.sendButton_XYT_2.clicked.connect(self.changementPosition)
+        self.ui.sendButton_jack.clicked.connect(self.departMatch)
 
-    def rotation(self):#callback function
+    def departMatch(self):#callback function
         msg_pamis.num_msg_int +=1
         msg_pamis.num_msg_str = str(msg_pamis.num_msg_int)
-        msg_pamis.num_pamis = self.ui.lineEdit_num_pamis.text()
+        msg_pamis.num_pamis = self.ui.comboBox.currentText()
+        msg_pamis.order = "6"
+        msg_pamis.arg1 = "1"
+        msg_pamis.arg2 = "0"
+        msg_pamis.arg3 = "0"    
+
+    def rotation(self):
+        msg_pamis.num_msg_int +=1
+        msg_pamis.num_msg_str = str(msg_pamis.num_msg_int)
+        msg_pamis.num_pamis = self.ui.comboBox.currentText()
         msg_pamis.order = "1"
-        degree = float(self.ui.lineEdit_rotation.text())
+        degree = int(self.ui.lineEdit_rotation.text())
         degree *= 10 #dizieme de degree
         msg_pamis.arg1 = str(int(degree))
         msg_pamis.arg2 = "0"
@@ -112,7 +112,7 @@ class MainWindow(QMainWindow):
     def translation(self):
         msg_pamis.num_msg_int +=1
         msg_pamis.num_msg_str = str(msg_pamis.num_msg_int)
-        msg_pamis.num_pamis = self.ui.lineEdit_num_pamis.text()
+        msg_pamis.num_pamis = self.ui.comboBox.currentText()
         msg_pamis.order = "2"
         distance = int(self.ui.lineEdit_translation.text())
         msg_pamis.arg1 = str(distance)
@@ -122,11 +122,11 @@ class MainWindow(QMainWindow):
     def XYT(self):
         msg_pamis.num_msg_int +=1
         msg_pamis.num_msg_str = str(msg_pamis.num_msg_int)
-        msg_pamis.num_pamis = self.ui.lineEdit_num_pamis.text()
+        msg_pamis.num_pamis = self.ui.comboBox.currentText()
         msg_pamis.order = "3"
         x = int(self.ui.lineEdit_XYT_x.text())
         y = int(self.ui.lineEdit_XYT_y.text())
-        theta = int(self.ui.lineEdit_XYT_theta.text())
+        theta = int(self.ui.lineEdit_XYT_theta.text()) * 10 #dizieme de degree
 
         msg_pamis.arg1 = str(x)
         msg_pamis.arg2 = str(y)
@@ -135,7 +135,7 @@ class MainWindow(QMainWindow):
     def recalage(self):
         msg_pamis.num_msg_int +=1
         msg_pamis.num_msg_str = str(msg_pamis.num_msg_int)
-        msg_pamis.num_pamis = self.ui.lineEdit_num_pamis.text()
+        msg_pamis.num_pamis = self.ui.comboBox.currentText()
         msg_pamis.order = "4"
         distance = int(self.ui.lineEdit_recalage_distance.text())
         coordonnee = 1 if self.ui.comboBox_recalage.currentText()=="x" else -1
@@ -143,6 +143,19 @@ class MainWindow(QMainWindow):
         msg_pamis.arg1 = str(distance)
         msg_pamis.arg2 = str(coordonnee)
         msg_pamis.arg3 = "0"
+    
+    def changementPosition(self):
+        msg_pamis.num_msg_int +=1
+        msg_pamis.num_msg_str = str(msg_pamis.num_msg_int)
+        msg_pamis.num_pamis = self.ui.comboBox.currentText()
+        msg_pamis.order = "5"
+        x = int(self.ui.lineEdit_XYT_x_2.text())
+        y = int(self.ui.lineEdit_XYT_y_2.text())
+        theta = int(self.ui.lineEdit_XYT_theta_2.text()) * 10 #dizieme de degree
+
+        msg_pamis.arg1 = str(x)
+        msg_pamis.arg2 = str(y)
+        msg_pamis.arg3 = str(theta)
 
     def closeEvent(self, event):
         print("Au revoir")
@@ -161,7 +174,7 @@ def run_flask():
 
 @flsk.route('/')
 def home():
-    return f'Hello, World! ROS Message: {ros_message}'
+    return f'Hello, World! ROS control pamis :> Go to /pamis'
 
 @flsk.route('/pamis')
 def pamis():
