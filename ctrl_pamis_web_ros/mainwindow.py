@@ -8,13 +8,15 @@
 
 
 import sys
-from PySide6.QtWidgets import QApplication, QMainWindow
-from .ui_mainwindow import Ui_MainWindow #ne pas oublier de faire 'pyside6-uic mainwindow.ui -o ui_mainwindow.py' à chaque modif du .ui
+from PySide6.QtWidgets import QApplication, QMainWindow, QTextEdit
+from PySide6.QtGui import QTextCharFormat
+from ui_mainwindow import Ui_MainWindow 
+#ne pas oublier de faire 'pyside6-uic mainwindow.ui -o ui_mainwindow.py' à chaque modif du .ui
 
 import rclpy
 from rclpy.node import Node
 
-from std_msgs.msg import String
+# from std_msgs.msg import String
 from interfaces_cdf.msg import PAMI
 from threading import Thread
 
@@ -35,6 +37,8 @@ class Message():
         self.arg1 = "0"
         self.arg2 = "0"
         self.arg3 = "0"
+        #String du Message affiché sur la page web, peut avoir plusieurs lignes : 
+        self.message = f'{self.num_msg_str},{self.num_pamis},{self.order},{self.arg1},{self.arg2},{self.arg3}' 
     # fin de la classe
 
 msg_pamis = Message() #structure mise en global
@@ -88,15 +92,13 @@ class MainWindow(QMainWindow):
         self.ui.sendButton_recalage.clicked.connect(self.recalage)
         self.ui.sendButton_XYT_2.clicked.connect(self.changementPosition)
         self.ui.sendButton_jack.clicked.connect(self.departMatch)
-
-    def departMatch(self):#callback function
-        msg_pamis.num_msg_int +=1
-        msg_pamis.num_msg_str = str(msg_pamis.num_msg_int)
-        msg_pamis.num_pamis = self.ui.comboBox.currentText()
-        msg_pamis.order = "6"
-        msg_pamis.arg1 = "1"
-        msg_pamis.arg2 = "0"
-        msg_pamis.arg3 = "0"    
+        self.ui.sendButton_reglage.clicked.connect(self.reglageCoef)
+        self.ui.sendButton_wait_for_jack.clicked.connect(self.attenteDuJack)
+        self.ui.sendButton_changement_ID_pamis.clicked.connect(self.reglageID)
+        self.ui.sendButton_reglage_couleur.clicked.connect(self.reglageCouleur)
+        
+        self.ui.sendButton_strategie.clicked.connect(self.envoiStrategie) 
+        self.ui.ClearButton_strategie.clicked.connect(self.ClearStrategie)
 
     def rotation(self):
         msg_pamis.num_msg_int +=1
@@ -109,6 +111,8 @@ class MainWindow(QMainWindow):
         msg_pamis.arg2 = "0"
         msg_pamis.arg3 = "0"
 
+        msg_pamis.message = f'{msg_pamis.num_msg_str},{msg_pamis.num_pamis},{msg_pamis.order},{msg_pamis.arg1},{msg_pamis.arg2},{msg_pamis.arg3}'
+
     def translation(self):
         msg_pamis.num_msg_int +=1
         msg_pamis.num_msg_str = str(msg_pamis.num_msg_int)
@@ -118,6 +122,8 @@ class MainWindow(QMainWindow):
         msg_pamis.arg1 = str(distance)
         msg_pamis.arg2 = "0"
         msg_pamis.arg3 = "0"
+
+        msg_pamis.message = f'{msg_pamis.num_msg_str},{msg_pamis.num_pamis},{msg_pamis.order},{msg_pamis.arg1},{msg_pamis.arg2},{msg_pamis.arg3}'
 
     def XYT(self):
         msg_pamis.num_msg_int +=1
@@ -132,6 +138,8 @@ class MainWindow(QMainWindow):
         msg_pamis.arg2 = str(y)
         msg_pamis.arg3 = str(theta)
 
+        msg_pamis.message = f'{msg_pamis.num_msg_str},{msg_pamis.num_pamis},{msg_pamis.order},{msg_pamis.arg1},{msg_pamis.arg2},{msg_pamis.arg3}'
+
     def recalage(self):
         msg_pamis.num_msg_int +=1
         msg_pamis.num_msg_str = str(msg_pamis.num_msg_int)
@@ -143,6 +151,8 @@ class MainWindow(QMainWindow):
         msg_pamis.arg1 = str(distance)
         msg_pamis.arg2 = str(coordonnee)
         msg_pamis.arg3 = "0"
+
+        msg_pamis.message = f'{msg_pamis.num_msg_str},{msg_pamis.num_pamis},{msg_pamis.order},{msg_pamis.arg1},{msg_pamis.arg2},{msg_pamis.arg3}'
     
     def changementPosition(self):
         msg_pamis.num_msg_int +=1
@@ -156,6 +166,77 @@ class MainWindow(QMainWindow):
         msg_pamis.arg1 = str(x)
         msg_pamis.arg2 = str(y)
         msg_pamis.arg3 = str(theta)
+
+        msg_pamis.message = f'{msg_pamis.num_msg_str},{msg_pamis.num_pamis},{msg_pamis.order},{msg_pamis.arg1},{msg_pamis.arg2},{msg_pamis.arg3}'
+
+    def departMatch(self):#callback function
+        msg_pamis.num_msg_int +=1
+        msg_pamis.num_msg_str = str(msg_pamis.num_msg_int)
+        msg_pamis.num_pamis = self.ui.comboBox.currentText()
+        msg_pamis.order = "6"
+        msg_pamis.arg1 = "1"
+        msg_pamis.arg2 = "0"
+        msg_pamis.arg3 = "0"
+
+        msg_pamis.message = f'{msg_pamis.num_msg_str},{msg_pamis.num_pamis},{msg_pamis.order},{msg_pamis.arg1},{msg_pamis.arg2},{msg_pamis.arg3}'
+
+    def reglageCoef(self):
+        msg_pamis.num_msg_int +=1
+        msg_pamis.num_msg_str = str(msg_pamis.num_msg_int)
+        msg_pamis.num_pamis = self.ui.comboBox.currentText()
+        msg_pamis.order = "7"
+        largeurRobot = int(self.ui.lineEdit_reglage_largeurRobot.text())
+        RayonRoue = int(self.ui.lineEdit_reglage_RayonRoue.text())
+
+        msg_pamis.arg1 = str(int(largeurRobot))
+        msg_pamis.arg2 = str(int(RayonRoue))
+        msg_pamis.arg3 = "0"
+
+        msg_pamis.message = f'{msg_pamis.num_msg_str},{msg_pamis.num_pamis},{msg_pamis.order},{msg_pamis.arg1},{msg_pamis.arg2},{msg_pamis.arg3}'
+        
+    def attenteDuJack(self):
+        msg_pamis.num_msg_int +=1
+        msg_pamis.num_msg_str = str(msg_pamis.num_msg_int)
+        msg_pamis.num_pamis = self.ui.comboBox.currentText()
+        msg_pamis.order = "8"
+        msg_pamis.arg1 = "1"
+        msg_pamis.arg2 = "0"
+        msg_pamis.arg3 = "0"
+
+        msg_pamis.message = f'{msg_pamis.num_msg_str},{msg_pamis.num_pamis},{msg_pamis.order},{msg_pamis.arg1},{msg_pamis.arg2},{msg_pamis.arg3}'
+        
+    def reglageID(self):
+        msg_pamis.num_msg_int +=1
+        msg_pamis.num_msg_str = str(msg_pamis.num_msg_int)
+        msg_pamis.num_pamis = self.ui.comboBox.currentText()
+        msg_pamis.order = "9"
+        newID = int(self.ui.lineEdit_changment_ID_pamis.text())
+
+        msg_pamis.arg1 = str(int(newID))
+        msg_pamis.arg2 = "0"
+        msg_pamis.arg3 = "0"
+        
+        msg_pamis.message = f'{msg_pamis.num_msg_str},{msg_pamis.num_pamis},{msg_pamis.order},{msg_pamis.arg1},{msg_pamis.arg2},{msg_pamis.arg3}'
+        
+    def reglageCouleur(self):
+        msg_pamis.num_msg_int +=1
+        msg_pamis.num_msg_str = str(msg_pamis.num_msg_int)
+        msg_pamis.num_pamis = self.ui.comboBox.currentText()
+        msg_pamis.order = "10"
+        color = 0
+        color = 1 if self.ui.comboBox_reglage_couleur.currentText() == "Jaune" else 0
+
+        msg_pamis.arg1 = str(int(color))
+        msg_pamis.arg2 = "0"
+        msg_pamis.arg3 = "0"
+        
+        msg_pamis.message = f'{msg_pamis.num_msg_str},{msg_pamis.num_pamis},{msg_pamis.order},{msg_pamis.arg1},{msg_pamis.arg2},{msg_pamis.arg3}'
+        
+    def envoiStrategie(self):
+        msg_pamis.message = self.ui.textEdit_strategie.toPlainText()
+
+    def ClearStrategie(self):
+        self.ui.textEdit_strategie.clear()
 
     def closeEvent(self, event):
         print("Au revoir")
@@ -178,7 +259,7 @@ def home():
 
 @flsk.route('/pamis')
 def pamis():
-    return f'{msg_pamis.num_msg_str},{msg_pamis.num_pamis},{msg_pamis.order},{msg_pamis.arg1},{msg_pamis.arg2},{msg_pamis.arg3}'
+    return msg_pamis.message
 
 def window_show():
     window = MainWindow()
